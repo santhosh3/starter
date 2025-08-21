@@ -63,7 +63,7 @@ for(let i = 0; i <= 10; i++) {
 
 let count = 0
 while(count <= 10) {
-    console.log(i);
+    console.log(count);
     count = count + 1
 }
 
@@ -169,6 +169,54 @@ console.log(a.concat(b)); // ["abcd", "qwer", "lkj", "weiir"];
 console.log([...a, ...b]); // ["abcd", "qwer", "lkj", "weiir"];
 
 
+// Objects -> Non-premive DT
+
+let obj = {}   // JSON JAVASCRIPT OBJECT NOTATION
+
+// Obj required 2 things key and value
+
+obj["name"] = "Santhosh"
+obj["age"] = "23"
+obj["fn"] = "abcd"
+
+console.log(obj)
+
+console.log(obj["name"]);
+
+console.log(Object.keys(obj)); // array
+console.log(Object.values(obj)); // array
+console.log(Object.entries(obj)); // array
+
+let array = [["key", "value"]];
+console.log(Object.fromEntries(array));
+
+obj["name"] = "zxcvbnm";
+delete obj["name"];
+
+// higher order functions
+
+// map, filter, forEach, find, reduce, sort
+
+let numArray = [1,2,3,4,5,6];
+console.log(numArray.map(x => x*x)) // [1,4,9,16,25,36]
+console.log(numArray.filter(x => x > 3)) // [4,5,6]
+numArray.forEach(x => console.log(x * 2)) //
+console.log(numArray.find(x => x>3)) // 4
+console.log(numArray.reduce((number,value) => number+value ,0))
+
+let n = 0;
+
+for(let i = 0; i < numArray.length; i++) {
+    n = n + numArray[i]
+}
+
+/**
+ *   number = 0, value = 1
+ *   number = 1, value = 2
+ *   number = 3, value = 3
+ *   number = 6, value = 4
+ * 
+ */
 
 
 
