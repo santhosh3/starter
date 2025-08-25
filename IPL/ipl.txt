@@ -1,0 +1,10 @@
+https://gitlab.com/nodejs-ipl-project/ipl-data-project-1/ipl-data-set-visualization-highcharts
+
+
+https://www.kaggle.com/datasets/patrickb1912/ipl-complete-dataset-20082020?select=deliveries.csv
+
+1) matches-won-per-team-per-year
+2) matches-per-year
+3) extra-runs-per-team-2016
+4) player-Of-The-Match-Awards-Each-Season
+5) Won-Toss-And-Match-by-each-team
