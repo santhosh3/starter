@@ -7,10 +7,10 @@ async function convertCSVToJSON(inputFilePath, outPutFilePath) {
 }
 
 const csvFilePathForMatches = './properties/matches.csv'; 
-const jsonFilePathForMatches = './properties/matches.json';
+const jsonFilePathForMatches = './jsonDB/matches.json';
 
 const csvFilePathFordeliveries = './properties/deliveries.csv'; 
-const jsonFilePathFordeliveries = './properties/deliveries.json';
+const jsonFilePathFordeliveries = './jsonDB/deliveries.json';
 
 function ConvertToJSON() {
     return Promise.all(
