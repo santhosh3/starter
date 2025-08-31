@@ -1,0 +1,31 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/santhosh3/starter.git"
+  },
+  "keywords": [
+    "nodeJS",
+    "expressJS"
+  ],
+  "author": "santhosh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/santhosh3/starter/issues"
+  },
+  "homepage": "https://github.com/santhosh3/starter#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.18.0",
+    "zod": "^4.1.5"
+  }
+}
