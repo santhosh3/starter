@@ -1,5 +1,5 @@
 const userModel = require("../models/user.model");
-const { hashPassword, registerUserValidation, decodePassword, loginUserValidation, createJWT } = require("../utils/index.js");
+const { hashPassword, decodePassword, createJWT, registerSchema, loginSchema, Validation } = require("../utils/index.js");
 
 async function register(reqest, response) {
   const body = reqest.body;
@@ -15,7 +15,7 @@ async function register(reqest, response) {
 
     const { name, bio, password, email } = reqest.body;
 
-    const { error, data } = registerUserValidation(reqest.body);
+    const { error, data } = Validation(reqest.body, registerSchema);
     if (error) {
       return response.status(400).send({ error, data });
     }
@@ -35,7 +35,10 @@ async function register(reqest, response) {
       password: await hashPassword(password),
       email,
     });
-    return response.status(201).send(responseData);
+
+    const jwtToken = createJWT({id : responseData._id})
+
+    return response.status(201).send({message : "successfully registred", token : jwtToken});
   } catch (error) {
     return response.status(500).send({ error: true, data: error.message });
   }
@@ -56,7 +59,7 @@ async function Login(request, response) {
     const { password, email } = body;
 
 
-    const { error, data } = loginUserValidation(request.body);
+    const { error, data } = Validation(request.body, loginSchema);
     if (error) {
       return response.status(400).send({ error, data });
     }
@@ -83,7 +86,19 @@ async function Login(request, response) {
   }
 }
 
+async function profile(reqest, response) {
+  try {
+    const userId = reqest.userId
+    const user = await userModel.findById(userId).select('name email bio -_id')
+    return response.send(user)
+  } catch (error) {
+     return response.status(500).send({ error: true, data: error.message });
+  }
+}
+
+
 module.exports = {
   register,
-  login: Login
+  login: Login,
+  profile
 };

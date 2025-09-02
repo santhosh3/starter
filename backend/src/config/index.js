@@ -5,3 +5,4 @@ module.exports = {
     DB : mongoDBURL,
     JWTSECRET
 }
+

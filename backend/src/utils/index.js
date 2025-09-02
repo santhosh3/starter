@@ -3,19 +3,28 @@ const z = require('zod');
 const jwt = require('jsonwebtoken');
 const { JWTSECRET } = require('../config/index');
 
-function registerUserValidation(data) {
-    try {
-        const userSchema = z.object({
+ const registerSchema = z.object({
             name: z.string(),
-            password: z.string(),
+            password: z.string().min(8),
             bio: z.string(),
             email: z.email(),
-        });
-        const result = userSchema.safeParse(data);
+});
+
+  const loginSchema = z.object({
+            password: z.string(),
+            email: z.email(),
+ });
+
+function Validation(data, schema) {
+    try {
+        const result = schema.safeParse(data);
         if (!result.success) {
             return {
                 error: true,
-                data: result.error
+                data: JSON.parse(result.error).reduce((obj,value) => {
+                   obj[value.path.join(',')] = value.message;
+                   return obj
+                },{})
             }
         } else {
             return {
@@ -26,36 +35,14 @@ function registerUserValidation(data) {
     } catch (error) {
         return {
             error: true,
-            data: error.message
+            data: JSON.parse(error.message).reduce((obj,value) => {
+                   obj[value.path.join(',')] = value.message;
+                   return obj
+                },{})
         }
     }
 }
 
-function loginUserValidation(data) {
-    try {
-        const userSchema = z.object({
-            password: z.string(),
-            email: z.email(),
-        });
-        const result = userSchema.safeParse(data);
-        if (!result.success) {
-            return {
-                error: true,
-                data: result.error
-            }
-        } else {
-            return {
-                error: false,
-                data: result.data
-            }
-        }
-    } catch (error) {
-        return {
-            error: true,
-            data: error.message
-        }
-    }
-}
 
 async function hashPassword(password) {
     return await bcrypt.hash(password, 10);
@@ -69,10 +56,16 @@ function createJWT(payload) {
     return jwt.sign(payload, JWTSECRET, { expiresIn: '2h' });
 }
 
+function decodeToken(token) {
+    return jwt.verify(token, JWTSECRET);
+}
+
 module.exports = {
     hashPassword,
-    registerUserValidation,
-    loginUserValidation,
+    Validation,
     decodePassword,
-    createJWT
+    createJWT,
+    decodeToken,
+    registerSchema,
+    loginSchema
 }
