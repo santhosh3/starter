@@ -31,9 +31,16 @@ app.use('/api', router);
 // http://localhost:3000/api/users
 
 
-mongoose.connect(DB)
-  .then(() => console.log('Connected!'))
-  .catch(err => console.log('Error', err.message))
+async function connectMongo() {
+  try {
+    await mongoose.connect(DB);
+    console.log('Connected!')
+  } catch (error) {
+    console.error('Error', err.message)
+  }
+}
+
+connectMongo()
 
 
 app.listen(3000);

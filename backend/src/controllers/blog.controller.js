@@ -1,31 +1,109 @@
 const blogModel = require('../models/blog.model');
 
 async function createBlog(reqest, response) {
-    if(Object.keys(reqest.body).length === 0) {
-       return response.status(400).send({error : true, message : "requires fields are missing"})
+    if (Object.keys(reqest.body).length === 0) {
+        return response.status(400).send({ error: true, message: "requires fields are missing" })
     }
     try {
-        const {title, body, tags} = reqest.body;
+        const { title, body, tags } = reqest.body;
         const userId = reqest.userId;
-        if(!title || !body || !tags) {
-            return response.status(400).send({error : true, message : "requires fields are missing"})
+        if (!title || !body || !tags) {
+            return response.status(400).send({ error: true, message: "requires fields are missing" })
         }
-        const checkTitle = await blogModel.findOne({title});
-        if(checkTitle) {
-             return response.status(400).send({error : true, message : "this title is alredy used"})
+        const checkTitle = await blogModel.findOne({ title });
+        if (checkTitle) {
+            return response.status(400).send({ error: true, message: "this title is alredy used" })
         }
 
-        const createBlog = await blogModel.create({
-            title, body, tags, author : userId
+        const createNewBlog = await blogModel.create({
+            title, body, tags, author: userId
         })
 
-        return response.status(201).send({error : false, data : createBlog, message : "blog created successfully"})
+        return response.status(201).send({ error: false, data: createNewBlog, message: "blog created successfully" })
 
     } catch (error) {
-        
+        return response.status(500).send({ error: true, data: error.message });
+    }
+}
+
+async function getAllBlogs(reqest, response) {
+    try {
+        let blogs = await blogModel.find({isDeleted : false, isPublished : true});
+        return response.status(200).send({ error: false, data: blogs })
+    } catch (error) {
+        return response.status(500).send({ error: true, data: error.message });
+    }
+}
+
+async function getBlogId(reqest, response) {
+    try {
+        let { blogId } = reqest.params;
+        let blog = await blogModel.findById(blogId);
+        return response.status(200).send({ error: false, data: blog })
+    } catch (error) {
+        return response.status(500).send({ error: true, data: error.message });
+    }
+}
+
+async function updateBlog(reqest, response) {
+    try {
+        let { blogId } = reqest.params;
+        let { title, body, tags } = reqest.body;
+
+        let updateBlogDataObj = {};
+
+        if (title) {
+            updateBlogDataObj.title = title
+        }
+        if (body) {
+            updateBlogDataObj.body = body
+        }
+
+        const isAuthBlog = await blogModel.findById(blogId);
+
+        if (isAuthBlog.author.toString() !== reqest.user._id && reqest.user.role !== "admin") {
+            return response.status(403).send({ error: true, message: "Not authorized to update this blog" })
+        }
+        const updateBlog = await blogModel.findByIdAndUpdate(
+            blogId,
+            {
+                $set: updateBlogDataObj,
+                $push: { tags }
+            },
+            { new: true }
+        );
+        return response.status(200).send({ error: false, data: updateBlog, message: "Blog updated" })
+    } catch (error) {
+        return response.status(500).send({ error: true, data: error.message });
+    }
+}
+
+async function deleteBlog(reqest, response) {
+    try {
+        let { blogId } = reqest.params;
+        const isAuthBlog = await blogModel.findById(blogId);
+
+        if (isAuthBlog.author.toString() !== reqest.user._id && reqest.user.role !== "admin") {
+            return response.status(403).send({ error: true, message: "Not authorized to update this blog" })
+        }
+        if (isAuthBlog.isDeleted) {
+            return response.status(400).send({ error: true, message: "blog is already deleted" })
+        }
+        await blogModel.findByIdAndUpdate(
+            blogId,
+            {isDeleted: true,deletedAt: Date.now()},
+            { new: true }
+        );
+        return response.status(200).send({ error: false, message: "Blog got deleted" })
+    } catch (error) {
+        return response.status(500).send({ error: true, data: error.message });
     }
 }
 
 module.exports = {
-    createBlog
+    createBlog,
+    getBlogId,
+    getAllBlogs,
+    updateBlog,
+    deleteBlog
 }

@@ -1,4 +1,5 @@
 const userModel = require("../models/user.model");
+const axios = require("axios");
 const { hashPassword, decodePassword, createJWT, registerSchema, loginSchema, Validation } = require("../utils/index.js");
 
 async function register(reqest, response) {
@@ -13,7 +14,7 @@ async function register(reqest, response) {
       return response.status(400).send({ error: true, message: `please fill details before register` });
     }
 
-    const { name, bio, password, email } = reqest.body;
+    const { name, bio, password, email, role } = reqest.body;
 
     const { error, data } = Validation(reqest.body, registerSchema);
     if (error) {
@@ -29,18 +30,39 @@ async function register(reqest, response) {
       });
     }
 
-    let responseData = await userModel.create({
+    const userInsert = {
       name,
       bio,
       password: await hashPassword(password),
-      email,
-    });
+      email
+    }
+
+    if(role) {
+      userInsert.role = role
+    }
+
+    let responseData = await userModel.create(userInsert);
 
     const jwtToken = createJWT({id : responseData._id})
 
     return response.status(201).send({message : "successfully registred", token : jwtToken});
   } catch (error) {
     return response.status(500).send({ error: true, data: error.message });
+  }
+}
+
+
+async function guestLogin(reqest, response) {
+  try {
+     const email = "guest@email.com";
+     const password = "guest123";
+     const responseLogin = await axios.post('http://localhost:3000/api/login', {email, password});
+     return response.status(responseLogin.response.status).send(responseLogin.data);
+  } catch (error) {
+     if(error.response.status < 500) {
+        return response.status(error.response.status).send(error.response.data);
+     }
+     return response.status(500).send({ error: true, data: error.message });
   }
 }
 
@@ -78,7 +100,7 @@ async function Login(request, response) {
 
     const jwtToken = createJWT({id : checkEmail._id})
 
-    return response.status(201).send({ message: 'Login successfull', token : jwtToken });
+    return response.status(200).send({ message: 'Login successfull', token : jwtToken });
 
   } catch (error) {
     return response.status(500).send({ error: true, data: error.message });
@@ -100,5 +122,6 @@ async function profile(reqest, response) {
 module.exports = {
   register,
   login: Login,
-  profile
+  profile,
+  guestLogin
 };

@@ -19,11 +19,19 @@ const BlogModel = new Schema({
     },
     tags: [String],
     deletedAt: {
-        type: String,
+        type: Date,
     },
     isDeleted: {
         type: Boolean,
         default: false
+    },
+    category: {
+        type : String,
+        required : true
+    },
+    isPublished: {
+        type : Boolean,
+        default : false
     }
 }, {
     timestamps: true
