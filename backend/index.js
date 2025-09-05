@@ -1,6 +1,11 @@
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
+ require('dotenv').config();
+const helmet = require('helmet');
+ const cors = require('cors');
+const sqlinjection = require('sql-injection');
+
 
 
 const router = require('./src/routes/routes.js');
@@ -18,8 +23,16 @@ const {DB} = require('./src/config/index.js');
    use => global middleware (app will understand JSON)
 */
 
+ let corsOptions = {
+        origin: ['http://localhost:5000'], // Specify allowed origins
+        methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed HTTP methods
+        optionsSuccessStatus: 200 // For legacy browser support
+ };
 
 app.use(express.json());
+app.use(helmet());
+app.use(sqlinjection());
+app.use(cors(corsOptions));
 
 // app.post('/data', (reqest, response) => {
 //     const body = reqest.body;
@@ -33,7 +46,7 @@ app.use('/api', router);
 
 async function connectMongo() {
   try {
-    await mongoose.connect(DB);
+    await mongoose.connect(process.env.MONGO_DB);
     console.log('Connected!')
   } catch (error) {
     console.error('Error', err.message)
@@ -42,9 +55,10 @@ async function connectMongo() {
 
 connectMongo()
 
+const PORT = process.env.PORT ?? 3000
 
-app.listen(3000);
-console.log("app is listening on port 3000")
+app.listen(PORT);
+console.log(`app is listening on port ${PORT}`)
 
 
 /*

@@ -13,7 +13,7 @@ router.get('/profile', AuntenticateUser, profile) // route level middleware
 
 router.post('/blog', AuntenticateUser, createBlog)
 router.get('/blog', AuntenticateUser, getAllBlogs) 
-router.get('/blog/:blogId', getBlogId)
+router.get('/blog/:blogId',AuntenticateUser, getBlogId)
 router.put('/blog/:blogId', AuntenticateUser, updateBlog) 
 router.delete('/blog/:blogId', AuntenticateUser, deleteBlog) 
 

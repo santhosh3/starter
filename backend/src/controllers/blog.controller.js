@@ -5,9 +5,9 @@ async function createBlog(reqest, response) {
         return response.status(400).send({ error: true, message: "requires fields are missing" })
     }
     try {
-        const { title, body, tags } = reqest.body;
-        const userId = reqest.userId;
-        if (!title || !body || !tags) {
+        const { title, body, tags, category } = reqest.body;
+        const userId = reqest.user._id;
+        if (!title || !body || !tags || !category) {
             return response.status(400).send({ error: true, message: "requires fields are missing" })
         }
         const checkTitle = await blogModel.findOne({ title });
@@ -16,7 +16,7 @@ async function createBlog(reqest, response) {
         }
 
         const createNewBlog = await blogModel.create({
-            title, body, tags, author: userId
+            title, body, tags, author: userId, category
         })
 
         return response.status(201).send({ error: false, data: createNewBlog, message: "blog created successfully" })
@@ -28,7 +28,7 @@ async function createBlog(reqest, response) {
 
 async function getAllBlogs(reqest, response) {
     try {
-        let blogs = await blogModel.find({isDeleted : false, isPublished : true});
+        let blogs = await blogModel.find({isDeleted : false, isPublished : true}).sort({"_id" : -1});
         return response.status(200).send({ error: false, data: blogs })
     } catch (error) {
         return response.status(500).send({ error: true, data: error.message });
@@ -38,8 +38,21 @@ async function getAllBlogs(reqest, response) {
 async function getBlogId(reqest, response) {
     try {
         let { blogId } = reqest.params;
-        let blog = await blogModel.findById(blogId);
-        return response.status(200).send({ error: false, data: blog })
+        let {title,  author, body, tags, category, createdAt, updatedAt} = await blogModel.findById(blogId).populate('author');
+        const blodData = {
+            title, 
+            author : {
+                name : author.name,
+                role : author.role,
+                bio : author.bio
+            },
+            body,
+            tags,
+            category,
+            createdAt,
+            updatedAt
+        }
+        return response.status(200).send({ error: false, data: blodData })
     } catch (error) {
         return response.status(500).send({ error: true, data: error.message });
     }

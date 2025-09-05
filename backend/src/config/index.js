@@ -1,8 +1,7 @@
-const mongoDBURL = 'mongodb://localhost:27017/medium';
-const JWTSECRET = '1234RTJERGBDZJ,VBZJSFBV,ZDKJBFJZ,D';
+ require('dotenv').config();
 
 module.exports = {
-    DB : mongoDBURL,
-    JWTSECRET
+    DB : process.env.MONGO_DB,
+    JWTSECRET : process.env.JWT_SECRET
 }
 
