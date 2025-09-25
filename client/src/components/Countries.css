@@ -1,0 +1,36 @@
+
+
+.CountryContainer {
+    margin: 10px;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.flagContainer {
+    border: 2px solid black;
+    padding: 1.2rem;
+
+}
+
+.name {
+    margin: 2rem;
+    display: center;
+}
+
+.Flagcontainer {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+}
+
+.alpha {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px
+}

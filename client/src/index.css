@@ -12,43 +12,41 @@ code {
     monospace;
 }
 
-@import "leaflet/dist/leaflet.css";
-
-html, body, #root {
-  height: 100vh;
-  margin: 0;
+* {
   padding: 0;
+  margin: 0;
 }
 
-
-.container {
+.formContainer {
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.content {
-  font-size: 63px;
-}
-
-.content-container {
-  display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+}
+
+input {
+  padding: 0.5rem;
+  margin: 5px;
+  border-radius: 10px;
+  font-size: 1.3rem;
+  border: 1px solid black;
 }
 
 button {
-  padding: 1.2rem;
-  color: white;
-  font-size: 20px;
-  background-color: rgb(5, 31, 5);
-  cursor: pointer;
+  font-size: 1.3rem;
+  padding: 10px;
+  color: blanchedalmond;
+  background-color: rgb(20, 63, 20);
   border: none;
+  border-radius: 9px;
+  cursor: pointer;
 }
 
-.button-container {
+.labelContainer {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  align-items: center;
+  gap:2rem
 }
+

@@ -1,0 +1,213 @@
+import React, { useEffect, useState } from "react";
+import io from "socket.io-client";
+import { MapContainer, TileLayer, Marker, Polyline, GeoJSON } from "react-leaflet";
+import L from "leaflet";
+
+// Custom marker icon (default Leaflet marker sometimes breaks in React)
+const markerIcon = new L.Icon({
+  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
+
+
+const socket = io("http://localhost:4000");
+
+export default function TrackingMap() {
+  const [location, setLocation] = useState({ lat: 12.9716, lng: 77.5946 }); // start: Bangalore
+  const [route, setRoute] = useState([]);
+  const myStyle = {
+  color: 'blue',
+  weight: 2,
+  opacity: 0.8,
+  fillColor: 'green', // Sky blue
+  fillOpacity: 0.5
+  };
+
+  const myGeojsonData = [{
+    "type": "Feature",
+    "properties": { "party": "Republican" },
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [[
+        [-104.05, 48.99],
+        [-97.22, 48.98],
+        [-96.58, 45.94],
+        [-104.03, 45.94],
+        [-104.05, 48.99]
+      ]]
+    }
+  }, {
+    "type": "Feature",
+    "properties": { "party": "Democrat" },
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [[
+        [-109.05, 41.00],
+        [-102.06, 40.99],
+        [-102.03, 36.99],
+        [-109.04, 36.99],
+        [-109.05, 41.00]
+      ]]
+    }
+  }]
+
+  //    [{
+  //     "type": "LineString",
+  //     "coordinates": [[-100, 40], [-105, 45], [-110, 55], [-100, 40]]
+  // }, {
+  //     "type": "LineString",
+  //     "coordinates": [[-105, 40], [-110, 45], [-115, 55], [-100, 40]]
+  // }]
+  //  {
+  //     "type": "FeatureCollection",
+  //     "features": [
+  //       {
+  //         "type": "Feature",
+  //         "properties": { "name": "My Point", "popupContent": "Hello!" },
+  //         "geometry": { "type": "Point", "coordinates": [-0.12, 51.5] }
+  //       },
+  //       {
+  //         "type": "Feature",
+  //         "properties": { "name": "My Polygon", "color": "green" },
+  //         "geometry": {
+  //           "type": "Polygon",
+  //           "coordinates": [[[-0.1, 51.5], [-0.2, 51.5], [-0.2, 51.4], [-0.1, 51.4], [-0.1, 51.5]]]
+  //         }
+  //       }
+  //     ]
+  //   };
+
+  useEffect(() => {
+    socket.emit("startRide", {
+      start: { lat: 12.9716, lng: 77.5946 }, // Bangalore
+      end: { lat: 12.2958, lng: 76.6394 },   // Mysore
+    });
+
+    socket.on("locationUpdate", ({ current, path }) => {
+      setLocation(current);
+      setRoute(path); // entire path once
+    });
+
+    socket.on("rideComplete", () => {
+      alert("Ride Completed!");
+    });
+
+    return () => {
+      socket.off("locationUpdate");
+      socket.off("rideComplete");
+    };
+  }, []);
+
+//   var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+//     maxZoom: 19,
+//     attribution: '© OpenStreetMap'
+// });
+
+// var osmHOT = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+//     maxZoom: 19,
+//     attribution: '© OpenStreetMap contributors, Tiles style by Humanitarian OpenStreetMap Team hosted by OpenStreetMap France'});
+
+
+
+  return (
+    <MapContainer
+      center={location}
+      zoom={7}
+      style={{ width: "100%", height: "100vh" }}
+    >
+     
+      <TileLayer url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+      />
+
+      {/* Blue route line */}
+      {route.length > 0 && (
+        <Polyline positions={route} color="blue" weight={4} />
+      )}
+      {/* Moving marker */}
+      <Marker position={location} icon={markerIcon} />
+      <GeoJSON data={myGeojsonData} style={myStyle}/>
+    </MapContainer>
+  );
+}
+
+/*
+
+https://graphhopper.com/api/1/route?profile=car&locale=en&key=7cb4eb19-e0f4-40a3-a5e0-f2c039366f32&elevation=false&instructions=true&point=17.360589%2C78.4740613&point=12.9767936%2C77.590082
+
+
+https://routing.openstreetmap.de/routed-car/route/v1/driving/78.4740613,17.360589;77.590082,12.9767936?overview=false&geometries=polyline&steps=true
+
+
+
+
+/nmspost api -- NMS_STATUS_UPDATE --> mainaince start and stop (existing)
+/mainitance start-end api -- MAINTANACE_START AND MAINTANCE_STOP(need to create) -reqbody (same as nmspost) - table- maintainace_details
+
+/search  done
+/schedule done
+
+
+import React, { useEffect, useState } from "react";
+import io from "socket.io-client";
+import { MapContainer, TileLayer, Marker, Polyline } from "react-leaflet";
+import L from "leaflet";
+
+// Custom marker icon (default Leaflet marker sometimes breaks in React)
+const markerIcon = new L.Icon({
+    iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+});
+
+const socket = io("http://localhost:4000");
+
+export default function TrackingMap() {
+    const [location, setLocation] = useState({ lat: 12.9716, lng: 77.5946 }); // start: Bangalore
+    const [route, setRoute] = useState([]);
+
+    useEffect(() => {
+        socket.emit("startRide", {
+            start: { lat: 12.9716, lng: 77.5946 }, // Bangalore
+            end: { lat: 12.2958, lng: 76.6394 },   // Mysore
+        });
+
+        socket.on("locationUpdate", ({ current, path }) => {
+            setLocation(current);
+            setRoute(path); // entire path once
+        });
+
+        socket.on("rideComplete", () => {
+            alert("Ride Completed!");
+        });
+
+        return () => {
+            socket.off("locationUpdate");
+            socket.off("rideComplete");
+        };
+    }, []);
+
+    return (
+        <MapContainer
+            center={location}
+            zoom={7}
+            style={{ width: "100%", height: "500px" }}
+        >
+            <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="&copy; OpenStreetMap contributors"
+            />
+            {/* Blue route line */}
+            {route.length > 0 && (
+                <Polyline positions={route} color="blue" weight={4} />
+            )}
+            {/* Moving marker */}
+            <Marker position={location} icon={markerIcon} />
+        </MapContainer>
+    );
+}
+
+
+
+*/

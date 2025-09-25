@@ -15,10 +15,8 @@ const io = socketIo(server, { cors: { origin: "*" } });
 async function getRoute(start, end) {
   try {
   const url = `https://router.project-osrm.org/route/v1/driving/${start.lng},${start.lat};${end.lng},${end.lat}?overview=full&geometries=geojson`;
-  console.log(url);
   const res = await axios.get(url);
   const coords = res.data.routes[0].geometry.coordinates;
-  console.log(coords)
   // convert [lng, lat] → {lat, lng}
   return coords.map(([lng, lat]) => ({ lat, lng }));
   } catch (error) {
@@ -27,7 +25,6 @@ async function getRoute(start, end) {
 }
 
 io.on("connection", (socket) => {
-  console.log("Client connected:", socket.id);
 
   socket.on("startRide", async ({ start, end }) => {
     console.log("Ride started:", start, "→", end);

@@ -1,0 +1,13 @@
+
+.container {
+    height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.board {
+    border : 1px solid black;
+    padding: 20px;
+}

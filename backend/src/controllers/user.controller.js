@@ -45,7 +45,12 @@ async function register(reqest, response) {
 
     const jwtToken = createJWT({id : responseData._id})
 
-    return response.status(201).send({message : "successfully registred", token : jwtToken});
+    const userObj = {
+      name,
+      token : jwtToken
+    }
+
+    return response.status(201).send({message : "successfully registred", user : userObj});
   } catch (error) {
     return response.status(500).send({ error: true, data: error.message });
   }
@@ -100,7 +105,13 @@ async function Login(request, response) {
 
     const jwtToken = createJWT({id : checkEmail._id})
 
-    return response.status(200).send({ message: 'Login successfull', token : jwtToken });
+    
+    const userObj = {
+      name : checkEmail?.name,
+      token : jwtToken
+    }
+
+    return response.status(200).send({ message: 'Login successfull', user : userObj });
 
   } catch (error) {
     return response.status(500).send({ error: true, data: error.message });
@@ -109,10 +120,15 @@ async function Login(request, response) {
 }
 
 async function profile(reqest, response) {
+  const token = reqest.headers.authorization;
   try {
-    const userId = reqest.userId
-    const user = await userModel.findById(userId).select('name email bio -_id')
-    return response.send(user)
+    const userId = reqest.user._id;
+    const user = await userModel.findById(userId).select('name email bio -_id');
+     const userObj = {
+      name : user?.name,
+      token : token.split(" ")[1]
+    }
+    return response.send({ message: 'Login successfull', user : userObj })
   } catch (error) {
      return response.status(500).send({ error: true, data: error.message });
   }
