@@ -68,7 +68,8 @@ function Boards() {
     return <div>{error}</div>;
   } else {
      return (
-    <div className="container mt-5">
+    <div className="bg-secondary">
+        <div className="container mt-5">
       <h2 className="mb-4">📋 Board Group Overview</h2>
       <div className="row g-4">
         {/* === 1. Mapped Boards === */}
@@ -158,6 +159,7 @@ function Boards() {
           </div>
         </>
       )}
+    </div>
     </div>
   );
   }
