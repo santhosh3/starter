@@ -9,24 +9,16 @@ const customStyles = {
     minHeight: "100vh",
     padding: "20px",
   },
-  // ⚠️ KEY CHANGE: Scrollbar-hiding rules are removed from here!
-  // These properties (like WebkitOverflowScrolling and overflowX: 'scroll') 
-  // must be applied via a dedicated CSS class (e.g., .kanban-scroll-wrapper) 
-  // that you define externally.
+  // Style for the wrapper that applies the external CSS class
   scrollWrapper: {
-    // This style is required for scrolling
-    overflowX: 'scroll',
-    // Optional mobile scrolling improvement
+    overflowX: 'scroll', // Must be here for inline style control
     WebkitOverflowScrolling: 'touch',
   },
   kanbanContainer: {
     display: "flex",
-    // Ensure this remains absent from here to allow the wrapper to handle scrolling
-    // overflowX: "auto", 
     gap: "15px",
-    alignItems: "flex-start",
-    // Ensures the flex items take up their full width, forcing scroll on the wrapper
-    minWidth: 'fit-content',
+    alignItems: "flex-start", // Prevents vertical stretching of lists
+    minWidth: 'fit-content', // Forces horizontal scroll activation
   },
   listColumn: {
     flexShrink: 0,
@@ -59,31 +51,73 @@ const customStyles = {
     justifyContent: "space-between",
     alignItems: "center",
   },
+  // ... (Other styles for input, buttons, etc.) ...
   addCardBtn: {
     color: "#A0A0A0",
     cursor: "pointer",
     padding: "5px 0",
     marginTop: "5px",
   },
-  addCardInput: {
-    backgroundColor: "#505050",
-    color: "white",
-    border: "none",
-    marginBottom: "5px",
-    resize: "none",
-    width: "100%",
-  },
   AddListButton: {
-    backgroundColor: "#505050",
+    backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+    color: 'white',
+    width: "300px",
+    height: "40px",
+    borderRadius: "8px",
+    border: 'none',
+    padding: '5px',
+    textAlign: 'left',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    transition: 'background-color 0.2s',
   },
   AddlistCSS: {
+    width: "300px",
+    backgroundColor: "#2D2D2D",
+    borderRadius: "8px",
+    padding: "10px",
     display: "flex",
     flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
     gap: "10px"
   },
-  // buttonRemoveCard : { border: "none", background: "none", cursor: "pointer"}
+  AddListInput: {
+    backgroundColor: "#404040",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    padding: "8px 10px",
+    width: "100%",
+  },
+  AddListActionButton: {
+    save: {
+        backgroundColor: '#5aac44',
+        color: 'white',
+        border: 'none',
+        borderRadius: '4px',
+        padding: '8px 12px',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+    },
+    close: {
+        background: 'none',
+        border: 'none',
+        color: '#A0A0A0',
+        fontSize: '1.5rem',
+        cursor: 'pointer',
+    }
+  },
+  buttonRemoveCard: {
+    background: 'none',
+    border: 'none',
+    color: '#A0A0A0',
+    cursor: 'pointer',
+    fontSize: '1.2rem',
+    fontWeight: 'bold',
+    marginLeft: '10px',
+    padding: '0 4px',
+    lineHeight: '1',
+    transition: 'color 0.2s',
+  }
 };
 
 function List() {
@@ -150,17 +184,17 @@ function List() {
     }
   }
 
-  const deleteCardFromList = async(listId, cardId) => {
+  const deleteCardFromList = async (listId, cardId) => {
     await deleteCard(cardId);
     setList(prev => ({
       ...prev,
-         data : prev.data.map((list) => {
-             if(list.id === listId) {
-                const newCards = list.cards.filter(card => card.id !== cardId);
-                const newList = {...list, cards : newCards};
-                return newList
-             } else return list   
-         })
+      data: prev.data.map((list) => {
+        if (list.id === listId) {
+          const newCards = list.cards.filter(card => card.id !== cardId);
+          const newList = { ...list, cards: newCards };
+          return newList
+        } else return list
+      })
     }))
   }
 
@@ -210,7 +244,12 @@ function List() {
                         {card.name}
                       </div>
                       <div>
-                       <button onClick={() => deleteCardFromList(list.id, card.id)} style={customStyles.buttonRemoveCard}>&times;</button>
+                        <button
+                          onClick={() => deleteCardFromList(list.id, card.id)}
+                          style={customStyles.buttonRemoveCard}
+                        >
+                          &times;
+                        </button>                      
                       </div>
                     </div>
                   ))}
@@ -227,9 +266,10 @@ function List() {
                 </div>
               </div>
             ))}
-            {showListInputBox ?
+            {showListInputBox ? (
               <div style={customStyles.AddlistCSS}>
                 <input
+                  style={customStyles.AddListInput} // Use new input style
                   placeholder="Enter a title for this list..."
                   value={listname}
                   onChange={(e) => setListName(e.target.value)}
@@ -241,16 +281,30 @@ function List() {
                   }}
                   autoFocus
                 />
-                <button onClick={() => handleSaveList()}>Add List</button>
-                <button onClick={() => {
-                  setListName('')
-                  setShowListInputBox(prev => !prev)
-                }}>close</button>
-              </div> :
-              <button style={customStyles.AddListButton} onClick={() => setShowListInputBox(prev => !prev)}>
-                +_Add_Another_List
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <button
+                    onClick={() => handleSaveList()}
+                    style={customStyles.AddListActionButton.save} // Use new save button style
+                    disabled={!listname.trim()}
+                  >
+                    Add List
+                  </button>
+                  <button
+                    onClick={() => {
+                      setListName('')
+                      setShowListInputBox(false) // Direct false is cleaner
+                    }}
+                    style={customStyles.AddListActionButton.close} // Use new close button style
+                  >
+                    &times;
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button style={customStyles.AddListButton} onClick={() => setShowListInputBox(true)}>
+                <i className="bi bi-plus-lg me-1"></i> + Add Another List
               </button>
-            }
+            )}
           </div>
         </div>
       </div>

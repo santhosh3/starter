@@ -50,3 +50,20 @@ button {
   gap:2rem
 }
 
+/* Add this CSS to a separate file (e.g., index.css) */
+
+.kanban-scroll-wrapper {
+  /* This ensures the scrolling mechanism is active */
+  overflow-x: scroll;
+  
+  /* --- Hiding the Scrollbar --- */
+  
+  /* Hides the scrollbar for IE, Edge, and Firefox */
+  -ms-overflow-style: none;    /* IE and Edge */
+  scrollbar-width: none;       /* Firefox */
+}
+
+/* Hides the scrollbar for WebKit browsers (Chrome, Safari, newer Edge) */
+.kanban-scroll-wrapper::-webkit-scrollbar {
+  display: none;
+}
